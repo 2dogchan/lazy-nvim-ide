@@ -1,129 +1,31 @@
--- Select colorscheme based on the time, and load it with LazyVim
--- day time: tokyonight (moon)
--- night time: random from {kanagawa, nightfox, cobalt2, everforest, rose-pine}
-local function selectColorSchemeByTime()
-  -- skip if running in vscode
-  if vim.g.vscode then
-    return "tokyonight"
-  end
-
-  local hour = tonumber(os.date("%H"))
-  local colorscheme
-
-  if hour >= 8 and hour < 18 then
-    colorscheme = "tokyonight"
-  else
-    local night_themes = { "kanagawa", "nightfox", "everforest", "rose-pine", "catppuccin-frappe" }
-    local idx = tonumber(os.date("%S")) % #night_themes + 1
-    colorscheme = night_themes[idx]
-
-    vim.notify("Selected colorscheme: " .. colorscheme)
-  end
-
-  return colorscheme
-end
-
 return {
   {
-    "rebelot/kanagawa.nvim",
-    lazy = true,
-    opts = {
-      transparent = true,
-      theme = "wave",
-      colors = {
-        theme = {
-          all = {
-            ui = {
-              bg_gutter = "none",
-              float = {
-                bg = "none",
-              },
-            },
-          },
+    "tokyonight.nvim",
+    opts = function()
+      return {
+        sidebars = {
+          "qf",
+          "vista_kind",
+          "terminal",
+          "spectre_panel",
+          "startuptime",
+          "Outline",
         },
-      },
-      overrides = function(colors)
-        local theme = colors.theme
-        return {
-          -- Transparent Floating Windows
-          NormalFloat = { bg = "none" },
-          FloatBorder = { bg = "none" },
-          FloatTitle = { bg = "none" },
-          -- Borderless Telescope
-          TelescopeTitle = { fg = theme.ui.special, bold = true },
-          TelescopePromptNormal = { bg = theme.ui.bg_p1 },
-          TelescopePromptBorder = { fg = theme.ui.bg_p1, bg = theme.ui.bg_p1 },
-          TelescopeResultsNormal = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m1 },
-          TelescopeResultsBorder = { fg = theme.ui.bg_m1, bg = theme.ui.bg_m1 },
-          TelescopePreviewNormal = { bg = theme.ui.bg_dim },
-          TelescopePreviewBorder = { bg = theme.ui.bg_dim, fg = theme.ui.bg_dim },
-        }
-      end,
-    },
-  },
-  {
-    "EdenEast/nightfox.nvim",
-    opts = {
-      options = {
-        transparent = true,
-        styles = {
-          comments = "italic",
-          keywords = "bold",
-          types = "italic,bold",
-        },
-      },
-    },
-    lazy = true,
-  },
-  {
-    "sainnhe/everforest",
-    config = function()
-      -- " Available values: 'hard', 'medium'(default), 'soft'
-      vim.g.everforest_background = "soft"
-      vim.g.everforest_transparent_background = 1
-      -- For better performance
-      vim.g.everforest_better_performance = 1
-      -- Enable italic
-      vim.g.everforest_enable_italic = 1
+        on_highlights = function(hl, c)
+          hl.CursorLineNr = { fg = c.orange, bold = true }
+          hl.LineNr = { fg = c.orange, bold = true }
+          hl.LineNrAbove = { fg = c.fg_gutter }
+          hl.LineNrBelow = { fg = c.fg_gutter }
+          local prompt = "#2d3149"
+          hl.TelescopeNormal = { bg = c.bg_dark, fg = c.fg_dark }
+          hl.TelescopeBorder = { bg = c.bg_dark, fg = c.bg_dark }
+          hl.TelescopePromptNormal = { bg = prompt }
+          hl.TelescopePromptBorder = { bg = prompt, fg = prompt }
+          hl.TelescopePromptTitle = { bg = c.fg_gutter, fg = c.orange }
+          hl.TelescopePreviewTitle = { bg = c.bg_dark, fg = c.bg_dark }
+          hl.TelescopeResultsTitle = { bg = c.bg_dark, fg = c.bg_dark }
+        end,
+      }
     end,
-    lazy = true,
-  },
-  {
-    "rose-pine/neovim",
-    name = "rose-pine",
-    opts = {
-      variant = "moon",
-      disable_background = true,
-      disable_float_background = true,
-    },
-    lazy = true,
-  },
-  {
-    "catppuccin/nvim",
-    lazy = true,
-    name = "catppuccin",
-    opts = {
-      transparent_background = true,
-    },
-  },
-  -- default is tokyonight in moon style
-  {
-    "folke/tokyonight.nvim",
-    opts = {
-      style = "moon",
-      transparent = true,
-      styles = {
-        sidebars = "transparent",
-        floats = "transparent",
-      },
-    },
-  },
-
-  -- set LazyVim to load colorscheme
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = selectColorSchemeByTime(),
-    },
   },
 }
