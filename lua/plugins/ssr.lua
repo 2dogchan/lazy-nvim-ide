@@ -11,17 +11,17 @@ return {
         next_match = "n",
         prev_match = "N",
         replace_confirm = "<cr>",
-        replace_all = "<leader><cr>",
+        replace_all = "<S-cr>",
       },
     },
     keys = {
-      -- Search and replace in current buffer
+      -- add <localleader>sr to search and replace
       {
-        "<leader>bs",
+        "<localleader>sR",
         function()
           require("ssr").open()
         end,
-        desc = "Search and Replace",
+        desc = "Structural Search & Replace",
       },
     },
   },

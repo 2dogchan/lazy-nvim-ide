@@ -55,11 +55,11 @@ local function find_upwards(filename)
 
   local max_search = 10 -- search up to parent directories
   while current_dir ~= "/" and search_count < max_search do
-    if vim.loop.fs_stat(current_dir .. "/" .. filename) then
+    if vim.uv.fs_stat(current_dir .. "/" .. filename) then
       return current_dir
     end
     -- stop find if we reach a git repo
-    if vim.loop.fs_stat(current_dir .. "/.git") then
+    if vim.uv.fs_stat(current_dir .. "/.git") then
       return nil
     end
     current_dir = vim.fn.fnamemodify(current_dir, ":h")

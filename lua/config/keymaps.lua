@@ -115,7 +115,7 @@ end
 keymap("v", "p", '"_dP', opts)
 
 -- Copy whole file content to clipboard with C-c
-keymap("n", "<C-c>", ":%y+<CR>", opts)
+-- keymap("n", "<C-c>", ":%y+<CR>", opts)
 
 -- Visual --
 -- Stay in indent mode

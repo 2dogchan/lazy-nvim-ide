@@ -47,6 +47,7 @@ return {
       -- nnoremap gP <cmd>lua require('goto-preview').close_all_win()<CR>
       -- nnoremap gpr <cmd>lua require('goto-preview').goto_preview_references()<CR>
     },
+    ft = { "go", "lua" },
     keys = {
       -- map gh to preview definition
       { "gh", "<cmd>lua require('goto-preview').goto_preview_definition()<CR>", desc = "Goto Preview Definition" },
@@ -64,7 +65,7 @@ return {
     },
     keys = {
       -- LSP finder - Find the symbol's definition
-      { "glf", "<cmd>Lspsaga lsp_finder<CR>", desc = "LSP Finder" },
+      { "glf", "<cmd>Lspsaga finder<CR>", desc = "LSP Finder" },
       -- Code action
       { "gla", "<cmd>Lspsaga code_action<CR>", desc = "Code Action" },
       -- Rename all occurrences of the hovered word for the entire file
@@ -82,6 +83,7 @@ return {
       { "gh", "<cmd>Lspsaga hover_doc<CR>", desc = "Hover Doc" },
     },
   },
+
   {
     -- Displaying references and definition infos upon functions like JB's IDEA.
     "VidocqH/lsp-lens.nvim",
@@ -109,5 +111,29 @@ return {
     event = "BufRead",
     dependencies = { "nvim-treesitter/nvim-treesitter", "neovim/nvim-lspconfig" },
     config = true,
+  },
+  {
+    "neovim/nvim-lspconfig",
+    dependencies = {
+      {
+        "williamboman/mason.nvim",
+        opts = function(_, opts)
+          opts.ensure_installed = opts.ensure_installed or {}
+          vim.list_extend(opts.ensure_installed, {
+            "codespell",
+            "misspell",
+          })
+        end,
+      },
+    },
+    opts = function(_, opts)
+      for _, file in
+        ipairs(vim.fn.readdir(vim.fn.stdpath("config") .. "/lua/plugins/extras/lsp", [[v:val =~ '\.lua$']]))
+      do
+        local server = file:gsub("%.lua$", "")
+        local src_opts = require("plugins.extras.lsp." .. server)
+        opts.servers[server] = vim.tbl_deep_extend("force", opts.servers[server] or {}, src_opts)
+      end
+    end,
   },
 }

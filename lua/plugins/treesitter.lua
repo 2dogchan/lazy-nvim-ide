@@ -2,6 +2,12 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     dependencies = { "windwp/nvim-ts-autotag" },
+
+    keys = {
+      { "<S-cr>", desc = "Increment selection" },
+      { "<bs>", desc = "Decrement selection", mode = "x" },
+    },
+
     opts = {
       ensure_installed = {
         "bash",
@@ -32,6 +38,13 @@ return {
       -- ensure_installed = "all", -- one of "all" or a list of languages
       ignore_install = { "" }, -- List of parsers to ignore installing
       sync_install = false, -- install languages synchronously (only applied to `ensure_installed`)
+
+      incremental_selection = {
+        keymaps = {
+          init_selection = "<S-cr>",
+          node_incremental = "<S-cr>",
+        },
+      },
 
       highlight = {
         enable = true, -- false will disable the whole extension
