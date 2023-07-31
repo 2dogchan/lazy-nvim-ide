@@ -48,16 +48,13 @@ return {
       -- nnoremap gpr <cmd>lua require('goto-preview').goto_preview_references()<CR>
     },
     ft = { "go", "lua" },
-    keys = {
-      -- map gh to preview definition
-      { "gh", "<cmd>lua require('goto-preview').goto_preview_definition()<CR>", desc = "Goto Preview Definition" },
-    },
   },
   {
     "glepnir/lspsaga.nvim",
     event = "LspAttach",
+    opts = {},
     config = true,
-    enabled = false, -- it is not stable, migrate to goto-preview plugin
+    enabled = false, -- disable lspsaga, use goto-preview instead
     dependencies = {
       { "nvim-tree/nvim-web-devicons" },
       -- Please make sure you install markdown and markdown_inline parser
@@ -66,20 +63,15 @@ return {
     keys = {
       -- LSP finder - Find the symbol's definition
       { "glf", "<cmd>Lspsaga finder<CR>", desc = "LSP Finder" },
-      -- Code action
-      { "gla", "<cmd>Lspsaga code_action<CR>", desc = "Code Action" },
-      -- Rename all occurrences of the hovered word for the entire file
-      { "glr", "<cmd>Lspsaga rename<CR>", desc = "Rename" },
-      -- Peek definition
-      { "glp", "<cmd>Lspsaga peek_definition<CR>", desc = "Peek Definition" },
       -- Go to definition
       { "gld", "<cmd>Lspsaga goto_definition<CR>", desc = "Go to Definition" },
       -- Go to type definition
       { "glt", "<cmd>Lspsaga goto_type_definition<CR>", desc = "Go to Type Definition" },
       -- Toggle Outline
       { "glo", "<cmd>Lspsaga outline<CR>", desc = "Toggle Outline" },
+      -- Peek definition
+      { "glp", "<cmd>Lspsaga peek_definition<CR>", desc = "Peek Definition" },
       -- Hover Doc
-      { "glh", "<cmd>Lspsaga hover_doc<CR>", desc = "Hover Doc" },
       { "gh", "<cmd>Lspsaga hover_doc<CR>", desc = "Hover Doc" },
     },
   },

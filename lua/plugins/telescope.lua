@@ -55,30 +55,6 @@ return {
           preview_cutoff = 120,
         },
         path_display = { "truncate" },
-      },
-    },
-    keys = {
-      -- add a keymap to browse plugin files
-      -- stylua: ignore
-      {
-        "<leader>fg",
-        function()
-          fallback_to_find_files_if_not_git()
-        end,
-        desc = "Find Git File",
-      },
-      -- find in file 
-      -- stylua: ignore
-      {
-        "<leader>fw",
-        function()
-          live_grep_from_project_git_root()
-        end,
-        desc = "Live Grep in Project Root",
-      },
-    },
-    opts = {
-      defaults = {
         mappings = {
           i = {
             -- 预览界面滚动
@@ -94,6 +70,32 @@ return {
             ["<C-v>"] = require("telescope.actions").file_vsplit,
           },
         },
+      },
+    },
+    keys = {
+      -- add a keymap to browse plugin files
+      {
+        "<leader>fg",
+        function()
+          fallback_to_find_files_if_not_git()
+        end,
+        desc = "Find Git File",
+      },
+      -- find in file
+      {
+        "<leader>fw",
+        function()
+          live_grep_from_project_git_root()
+        end,
+        desc = "Live Grep in Project Root",
+      },
+      -- add gR to resume telescope
+      {
+        "gR",
+        function()
+          require("telescope.builtin").resume()
+        end,
+        desc = "Resume Last Telescope",
       },
     },
     -- add telescope-fzf-native
