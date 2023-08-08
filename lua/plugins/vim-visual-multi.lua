@@ -1,4 +1,5 @@
 return {
+  --TODO: use smoka7/multicursors.nvim instead
   "mg979/vim-visual-multi",
   lazy = false,
   init = function()
