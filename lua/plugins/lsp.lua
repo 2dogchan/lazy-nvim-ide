@@ -47,7 +47,7 @@ return {
       -- nnoremap gP <cmd>lua require('goto-preview').close_all_win()<CR>
       -- nnoremap gpr <cmd>lua require('goto-preview').goto_preview_references()<CR>
     },
-    ft = { "go", "lua" },
+    ft = { "go", "lua", "dart" },
   },
   {
     "glepnir/lspsaga.nvim",
