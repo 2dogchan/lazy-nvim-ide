@@ -37,45 +37,14 @@ return {
     end,
   },
   {
-    "rmagatti/goto-preview",
-    opts = {
-      default_mappings = true,
-      -- default_mappings = false, and then you can map preview window with your favorite keymap
-      -- nnoremap gpd <cmd>lua require('goto-preview').goto_preview_definition()<CR>
-      -- nnoremap gpt <cmd>lua require('goto-preview').goto_preview_type_definition()<CR>
-      -- nnoremap gpi <cmd>lua require('goto-preview').goto_preview_implementation()<CR>
-      -- nnoremap gP <cmd>lua require('goto-preview').close_all_win()<CR>
-      -- nnoremap gpr <cmd>lua require('goto-preview').goto_preview_references()<CR>
-    },
-    ft = { "go", "lua", "dart" },
-  },
-  {
-    "glepnir/lspsaga.nvim",
-    event = "LspAttach",
-    opts = {},
-    config = true,
-    enabled = false, -- disable lspsaga, use goto-preview instead
-    dependencies = {
-      { "nvim-tree/nvim-web-devicons" },
-      -- Please make sure you install markdown and markdown_inline parser
-      { "nvim-treesitter/nvim-treesitter" },
-    },
+    "dnlhc/glance.nvim",
     keys = {
-      -- LSP finder - Find the symbol's definition
-      { "glf", "<cmd>Lspsaga finder<CR>", desc = "LSP Finder" },
-      -- Go to definition
-      { "gld", "<cmd>Lspsaga goto_definition<CR>", desc = "Go to Definition" },
-      -- Go to type definition
-      { "glt", "<cmd>Lspsaga goto_type_definition<CR>", desc = "Go to Type Definition" },
-      -- Toggle Outline
-      { "glo", "<cmd>Lspsaga outline<CR>", desc = "Toggle Outline" },
-      -- Peek definition
-      { "glp", "<cmd>Lspsaga peek_definition<CR>", desc = "Peek Definition" },
-      -- Hover Doc
-      { "gh", "<cmd>Lspsaga hover_doc<CR>", desc = "Hover Doc" },
+      { "gld", "<cmd>Glance definitions<cr>", desc = "Glance Definition" },
+      { "glr", "<cmd>Glance references<cr>", desc = "Glance References" },
+      { "glt", "<cmd>Glance type_definitions<cr>", desc = "Glance Type Definition" },
+      { "gli", "<cmd>Glance implementations<cr>", desc = "Glance Implementation" },
     },
   },
-
   {
     -- Displaying references and definition infos upon functions like JB's IDEA.
     "VidocqH/lsp-lens.nvim",
