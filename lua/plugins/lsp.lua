@@ -119,7 +119,7 @@ return {
         ansiblels = {},
         bashls = {},
         clangd = {},
-        denols = {},
+        -- denols = {},
         cssls = {},
         dockerls = {},
         ruff_lsp = {},
