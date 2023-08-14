@@ -15,7 +15,7 @@ return {
       },
     },
     keys = {
-      -- add <localleader>sr to search and replace
+      -- Search and replace in current buffer
       {
         "<localleader>sR",
         function()
