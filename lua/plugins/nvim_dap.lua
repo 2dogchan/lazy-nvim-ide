@@ -8,5 +8,6 @@ return {
     { "<F7>", dap.step_into, desc = "Step Into" },
     { "<F8>", dap.step_over, desc = "Step Over" },
     { "<F9>", dap.continue, desc = "Continue" },
+    { "<leader>dh", require("dap.ui.widgets").hover, desc = "Hover" },
   },
 }
