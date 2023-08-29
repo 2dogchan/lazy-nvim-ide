@@ -118,7 +118,7 @@ return {
         -- },
         ansiblels = {},
         bashls = {},
-        clangd = {},
+        -- clangd = {},
         -- denols = {},
         cssls = {},
         dockerls = {},
@@ -158,7 +158,8 @@ return {
             },
           },
         },
-        -- svelte = {},
+        svelte = {},
+        -- volar = {},
         html = {},
         gopls = {
           root_dir = function()
@@ -255,6 +256,7 @@ return {
           },
         },
         vimls = {},
+        bufls = {},
       },
       setup = {},
     },

@@ -48,9 +48,7 @@ return {
 
       highlight = {
         enable = true, -- false will disable the whole extension
-        disable = function(lang, bufnr) -- don't parse large lines
-          return lang == "css" or vim.api.nvim_buf_line_count(bufnr) > 5000
-        end,
+        disable = { "css" }, -- list of language that will be disabled
       },
       autopairs = {
         enable = true,
