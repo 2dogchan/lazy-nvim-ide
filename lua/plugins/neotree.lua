@@ -64,14 +64,13 @@ return {
           require("telescope.builtin").live_grep({ cwd = dir(state.tree:get_node():get_id()) })
         end,
       },
-    },
-    window = {
-      mappings = {
-        ["o"] = "open",
-        ["Y"] = "copy_path_to_clipboard",
-        ["u"] = "jump_to_parent_node",
-        ["<leader><leader>"] = "find_files",
-        ["<leader>/"] = "live_grep",
+      window = {
+        mappings = {
+          ["Y"] = "copy_path_to_clipboard",
+          ["u"] = "jump_to_parent_node",
+          ["<leader><leader>"] = "find_files",
+          ["<leader>/"] = "live_grep",
+        },
       },
     },
   },
