@@ -48,6 +48,7 @@ return {
   {
     -- Displaying references and definition infos upon functions like JB's IDEA.
     "VidocqH/lsp-lens.nvim",
+    enabled = false,
     event = "BufRead",
     opts = {
       include_declaration = true, -- Reference include declaration
