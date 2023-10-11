@@ -1,14 +1,14 @@
--- disable lsp-inlayhints if that is nightly version, will remove when 0.10.0 is stable
-local enabled_inlay_hints = true
+-- disable lsp-inlayhints and lsp lenf if that is nightly version, will remove when 0.10.0 is stable
+local is_stable_version = true
 if vim.fn.has("nvim-0.10.0") == 1 then
-  enabled_inlay_hints = false
+  is_stable_version = false
 end
 
 return {
   {
     "lvimuser/lsp-inlayhints.nvim",
     ft = { "javascript", "javascriptreact", "json", "jsonc", "typescript", "typescriptreact", "svelte", "go" },
-    enabled = enabled_inlay_hints,
+    enabled = is_stable_version,
     opts = {
       debug_mode = true,
     },
@@ -261,35 +261,5 @@ return {
       },
       setup = {},
     },
-  },
-  -- null-ls
-  {
-    "jose-elias-alvarez/null-ls.nvim",
-    opts = function(_, opts)
-      local nls = require("null-ls")
-      vim.list_extend(opts.sources, {
-        nls.builtins.formatting.dprint.with({
-          condition = function(utils)
-            return utils.root_has_file({ "dprint.json" }) or vim.loop.fs_stat("dprint.json")
-          end,
-        }),
-        nls.builtins.formatting.prettier.with({ filetypes = { "markdown" } }),
-        nls.builtins.diagnostics.markdownlint,
-        nls.builtins.diagnostics.deno_lint,
-        nls.builtins.diagnostics.selene.with({
-          condition = function(utils)
-            return utils.root_has_file({ "selene.toml" })
-          end,
-        }),
-        nls.builtins.formatting.isort,
-        nls.builtins.formatting.black,
-        nls.builtins.diagnostics.flake8,
-        nls.builtins.diagnostics.luacheck.with({
-          condition = function(utils)
-            return utils.root_has_file({ ".luacheckrc" })
-          end,
-        }),
-      })
-    end,
   },
 }
