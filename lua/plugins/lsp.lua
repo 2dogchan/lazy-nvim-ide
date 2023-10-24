@@ -262,4 +262,25 @@ return {
       setup = {},
     },
   },
+  {
+    -- Displaying references and definition infos upon functions
+    "VidocqH/lsp-lens.nvim",
+    event = "BufRead",
+    opts = {
+      include_declaration = false, -- Reference include declaration
+      sections = { -- Enable / Disable specific request, formatter example looks 'Format Requests'
+        definition = false,
+        references = true,
+        implements = false,
+      },
+    },
+    keys = {
+      {
+        -- LspLensToggle
+        "<leader>uL",
+        "<cmd>LspLensToggle<CR>",
+        desc = "LSP Len Toggle",
+      },
+    },
+  },
 }
