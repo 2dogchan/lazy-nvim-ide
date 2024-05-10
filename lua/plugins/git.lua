@@ -29,6 +29,10 @@ return {
     "sindrets/diffview.nvim",
     lazy = not is_inside_git_repo(),
     cmd = "DiffviewOpen",
-    keys = { { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Open Git Diff" } },
+    keys = {
+      { "<leader>gd", "<cmd>DiffviewFileHistory %<cr>", desc = "history (file)" },
+      { "<leader>gD", "<cmd>DiffviewFileHistory<cr>", desc = "history (branch)" },
+      { "<leader>gd", "<cmd>'<,'>DiffviewFileHistory<cr>", mode = "v", desc = "history (line)" },
+    },
   },
 }
