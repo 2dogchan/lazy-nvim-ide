@@ -22,13 +22,13 @@ return {
       -- Navigate conflicts
       { "<leader>gfl", "<cmd>GitConflictListQf<cr>", desc = "Git Conflict Quicklist" },
       { "<leader>gfp", "<cmd>GitConflictPrevConflict<cr>", desc = "Git Conflict Previous" },
-      { "<leader>gfp", "<cmd>GitConflictPrevConflict<cr>", desc = "Git Conflict Previous" },
+      { "<leader>gfn", "<cmd>GitConflictNextConflict<cr>", desc = "Git Conflict Next" },
     },
   },
   {
     "sindrets/diffview.nvim",
     lazy = not is_inside_git_repo(),
     cmd = "DiffviewOpen",
-    keys = { { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Open Git Diff" } },
+    keys = { { "<leader>go", "<cmd>DiffviewOpen<cr>", desc = "Open Git Diff" } },
   },
 }

@@ -1,44 +1,41 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    dependencies = { "windwp/nvim-ts-autotag" },
-
+    build = function()
+      -- Force reinstall all parsers after plugin update to keep query/parser in sync
+      local install = require("nvim-treesitter.install")
+      local langs = require("nvim-treesitter.config").get_installed()
+      for _, lang in ipairs(langs) do
+        install.install(lang, { force = true })
+      end
+    end,
     keys = {
       { "<S-cr>", desc = "Increment selection" },
       { "<bs>", desc = "Decrement selection", mode = "x" },
     },
-
     opts = {
       ensure_installed = {
         "bash",
         "regex",
         "vim",
+        "vimdoc",
         "lua",
-        "html",
+        "luadoc",
+        "luap",
+        "go",
+        "gomod",
+        "gosum",
+        "gowork",
         "markdown",
         "markdown_inline",
-        "css",
-        "typescript",
-        "tsx",
-        "javascript",
-        "http",
         "json",
-        "json5",
         "jsonc",
-        "graphql",
-        "prisma",
-        "rust",
-        "go",
+        "yaml",
         "toml",
-        "c",
         "proto",
-        "svelte",
-        "astro",
       },
       auto_install = true,
-      -- ensure_installed = "all", -- one of "all" or a list of languages
-      ignore_install = { "" }, -- List of parsers to ignore installing
-      sync_install = false, -- install languages synchronously (only applied to `ensure_installed`)
+      sync_install = false,
 
       incremental_selection = {
         keymaps = {
@@ -48,23 +45,19 @@ return {
       },
 
       highlight = {
-        enable = true, -- false will disable the whole extension
-        disable = { "css" }, -- list of language that will be disabled
+        enable = true,
+        disable = function(_, buf)
+          local max_filesize = 1024 * 1024 -- 1 MB
+          local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
+          if ok and stats and stats.size > max_filesize then
+            return true
+          end
+        end,
       },
       autopairs = {
         enable = true,
       },
-      indent = { enable = true, disable = { "python", "css" } },
-
-      context_commentstring = {
-        enable = true,
-        enable_autocmd = false,
-      },
-
-      -- auto tag
-      autotag = {
-        enable = true,
-      },
+      indent = { enable = true },
     },
   },
 }

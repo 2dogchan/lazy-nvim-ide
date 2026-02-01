@@ -5,13 +5,15 @@ end
 return {
   "nvim-neo-tree/neo-tree.nvim",
   dependencies = {
-    "s1n7ax/nvim-window-picker",
-    name = "window-picker",
-    event = "VeryLazy",
-    version = "2.*",
-    config = function()
-      require("window-picker").setup()
-    end,
+    {
+      "s1n7ax/nvim-window-picker",
+      name = "window-picker",
+      event = "VeryLazy",
+      version = "2.*",
+      config = function()
+        require("window-picker").setup()
+      end,
+    },
   },
   keys = {
     {
@@ -23,6 +25,11 @@ return {
   opts = {
     close_if_last_window = true, -- Close Neo-tree if it is the last window left in the tab
     filesystem = {
+      filtered_items = {
+        visible = true,
+        hide_dotfiles = false,
+        hide_gitignored = false,
+      },
       follow_current_file = { enabled = true }, -- This will find and focus the file in the active buffer every
       hijack_netrw_behavior = "open_default", -- netrw disabled, opening a directory opens neo-tree
       commands = {
@@ -56,12 +63,12 @@ return {
 
         -- Find files in path
         find_files = function(state)
-          require("telescope.builtin").find_files({ cwd = dir(state.tree:get_node():get_id()) })
+          require("fzf-lua").files({ cwd = dir(state.tree:get_node():get_id()) })
         end,
 
         -- Search keyword in path
         live_grep = function(state)
-          require("telescope.builtin").live_grep({ cwd = dir(state.tree:get_node():get_id()) })
+          require("fzf-lua").live_grep({ cwd = dir(state.tree:get_node():get_id()) })
         end,
       },
       window = {
