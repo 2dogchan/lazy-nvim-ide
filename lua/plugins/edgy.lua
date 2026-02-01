@@ -51,17 +51,11 @@ return {
       },
       left = {
         "neo-tree",
-        { ft = "spectre_panel", size = { width = 0.3 } },
         { ft = "undotree", title = "UndoTree" },
       },
       right = {
         { title = "Neotest Summary", ft = "neotest-summary" },
-        {
-          ft = "Outline",
-          open = "SymbolsOutlineOpen",
-        },
         "aerial",
-        "lspsagaoutline",
       },
     },
   },

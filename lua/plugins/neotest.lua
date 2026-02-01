@@ -1,40 +1,14 @@
 return {
   {
     "nvim-neotest/neotest",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "antoinemadec/FixCursorHold.nvim",
-      -- add adapter for neotest
-      "nvim-neotest/neotest-python",
-      "nvim-neotest/neotest-vim-test",
-      "haydenmeade/neotest-jest",
-      "marilari88/neotest-vitest",
-      "markemmons/neotest-deno",
-      "nvim-neotest/neotest-go",
-      "rouge8/neotest-rust",
-      "theutz/neotest-pest",
-    },
-    opts = {
-      -- Can be a list of adapters like what neotest expects,
-      -- or a table of adapter names, mapped to adapter configs.
-      -- The adapter will then be automatically loaded with the config.
-      adapters = {
-        ["neotest-deno"] = {},
-        ["neotest-jest"] = {},
-        ["neotest-vitest"] = {},
-        ["neotest-vim-test"] = {
-          ignore_file_types = { "python", "vim", "lua", "go", "rust" },
-        },
-        ["neotest-python"] = {},
-        ["neotest-go"] = {},
-        ["neotest-rust"] = {},
-        ["neotest-pest"] = {
-          pest_cmd = function()
-            return "vendor/bin/pest"
-          end,
-        },
-      },
-    },
+    opts = function(_, opts)
+      opts.adapters = opts.adapters or {}
+      for i, adapter in ipairs(opts.adapters) do
+        if type(adapter) == "table" and adapter[1] == "neotest-golang" then
+          adapter[2] = vim.tbl_deep_extend("force", adapter[2] or {}, { warn_test_name_dupes = false })
+          return
+        end
+      end
+    end,
   },
 }

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(nvim:*)",
+      "WebSearch",
+      "WebFetch(domain:www.lazyvim.org)",
+      "Bash(ls:*)",
+      "Bash(cc:*)",
+      "Bash(xcode-select:*)",
+      "Bash(pkgutil:*)"
+    ]
+  }
+}

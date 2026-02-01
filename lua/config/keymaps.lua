@@ -68,7 +68,7 @@ end
 keymap(
   "n",
   "<leader>uD",
-  "<cmd>lua toggle_diagnostics_level()<CR>",
+  "<cmd>lua _G.toggle_diagnostics_level()<CR>",
   { noremap = true, silent = true, desc = "Toggle Diagnostics Level" }
 )
 
@@ -77,8 +77,7 @@ keymap(
 keymap("n", "<leader>;", function()
   -- close all open buffers before open dashboard
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-    ---@diagnostic disable-next-line: redundant-parameter
-    local buftype = vim.api.nvim_buf_get_option(bufnr, "buftype")
+    local buftype = vim.bo[bufnr].buftype
     if buftype ~= "terminal" then
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end
@@ -127,27 +126,21 @@ keymap("v", "<A-Up>", ":m '<-2<CR>gv=gv", opts)
 -- Show Lsp info
 keymap("n", "<leader>cl", "<cmd>LspInfo<CR>", opts)
 
--- Show references on telescope
-if Util.has("telescope.nvim") then
-  keymap("n", "gr", "<cmd>Telescope lsp_references<CR>")
-end
+-- Neovim 0.11+ built-in: grr=references, gra=code_action, gri=implementation, grn=rename
 
--- LspSaga
-if Util.has("lspsaga.nvim") then
-  -- Diagnostic jump with filters such as only jumping to an error
-  keymap("n", "[E", function()
-    require("lspsaga.diagnostic"):goto_prev({ severity = vim.diagnostic.severity.ERROR })
-  end)
-  keymap("n", "]E", function()
-    require("lspsaga.diagnostic"):goto_next({ severity = vim.diagnostic.severity.ERROR })
-  end)
-end
+-- Diagnostic jump with filters such as only jumping to an error
+keymap("n", "[E", function()
+  vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
+end, { desc = "Prev Error" })
+keymap("n", "]E", function()
+  vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+end, { desc = "Next Error" })
 
 -- Trouble
 -- Add keymap only show FIXME
 if Util.has("todo-comments.nvim") then
   -- show fixme on telescope
-  keymap("n", "<leader>xf", "<cmd>TodoTelescope keywords=FIX,FIXME<CR>", {
+  keymap("n", "<leader>xf", "<cmd>TodoFzfLua keywords=FIX,FIXME<CR>", {
     desc = "Show FIXME",
   })
 end
@@ -160,16 +153,56 @@ if Util.has("gitsigns.nvim") then
   })
 end
 
--- Harpoon
-if Util.has("harpoon") then
-  keymap("n", "<leader>hh", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<CR>", {
-    desc = "Toggle Harpoon menu",
-  })
 
-  keymap("n", "<leader>ha", "<cmd>lua require('harpoon.mark').add_file()<CR>", {
-    desc = "Add file to Harpoon",
-  })
-end
+-- Ctrl+LeftMouse: auto gd or gr
+-- If cursor is on a definition → show references; otherwise → go to definition
+keymap("n", "<C-LeftMouse>", function()
+  -- Move cursor to click position
+  local mousepos = vim.fn.getmousepos()
+  if mousepos.winid ~= 0 then
+    vim.api.nvim_set_current_win(mousepos.winid)
+  end
+  if mousepos.line > 0 then
+    vim.api.nvim_win_set_cursor(0, { mousepos.line, math.max(0, mousepos.column - 1) })
+  end
+
+  local params = vim.lsp.util.make_position_params()
+  vim.lsp.buf_request(0, "textDocument/definition", params, function(err, result)
+    if err or not result or vim.tbl_isempty(result) then
+      vim.schedule(function()
+        vim.cmd("FzfLua lsp_references jump1=true ignore_current_line=true")
+      end)
+      return
+    end
+    local def = vim.islist(result) and result[1] or result
+    local def_uri = def.uri or def.targetUri
+    local def_range = def.range or def.targetSelectionRange
+    local current_uri = vim.uri_from_bufnr(0)
+    local cursor_line = mousepos.line - 1
+    -- Check if we're already at the definition
+    if def_uri == current_uri and def_range and def_range.start.line == cursor_line then
+      vim.schedule(function()
+        vim.cmd("FzfLua lsp_references jump1=true ignore_current_line=true")
+      end)
+    else
+      vim.schedule(function()
+        vim.cmd("FzfLua lsp_definitions jump1=true ignore_current_line=true")
+      end)
+    end
+  end)
+end, { desc = "Smart goto: definition or references" })
+
+-- RightMouse: toggle breakpoint on clicked line
+keymap("n", "<RightMouse>", function()
+  local mousepos = vim.fn.getmousepos()
+  if mousepos.winid ~= 0 then
+    vim.api.nvim_set_current_win(mousepos.winid)
+  end
+  if mousepos.line > 0 then
+    vim.api.nvim_win_set_cursor(0, { mousepos.line, 0 })
+  end
+  require("dap").toggle_breakpoint()
+end, { desc = "Toggle breakpoint at mouse position" })
 
 -- Fix Spell checking
 keymap("n", "z0", "1z=", {
