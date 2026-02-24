@@ -23,8 +23,6 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.ui.edgy" },
     -- Util
     { import = "lazyvim.plugins.extras.util.mini-hipatterns" },
-    -- AI
-    { import = "lazyvim.plugins.extras.ai.copilot" },
     -- import/override with your plugins
     { import = "plugins" },
   },
@@ -37,7 +35,7 @@ require("lazy").setup({
     version = false, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
-  install = { colorscheme = { "jb" } },
+  install = { colorscheme = { "onedark" } },
   checker = { enabled = true }, -- automatically check for plugin updates
   performance = {
     rtp = {
