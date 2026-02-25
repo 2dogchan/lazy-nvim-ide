@@ -16,6 +16,9 @@ vim.g.loaded_ruby_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_node_provider = 0
 
+-- Always use the cwd where nvim was launched as root (don't auto-switch based on LSP)
+vim.g.root_spec = { "cwd" }
+
 -- Zed-like options
 vim.o.scrolloff = 8
 vim.o.wrap = false
