@@ -1,65 +1,38 @@
---- Live grep from project git root
-local function live_grep_from_project_git_root()
-  local function is_git_repo()
-    vim.fn.system("git rev-parse --is-inside-work-tree")
-    return vim.v.shell_error == 0
-  end
-
-  local function get_git_root()
-    local dot_git_path = vim.fn.finddir(".git", ".;")
-    return vim.fn.fnamemodify(dot_git_path, ":h")
-  end
-
-  local opts = {}
-  if is_git_repo() then
-    opts = { cwd = get_git_root() }
-  end
-
-  require("fzf-lua").live_grep(opts)
-end
-
---- Fallback to git_files if in git repo
-local function fallback_to_find_files_if_not_git()
-  vim.fn.system("git rev-parse --is-inside-work-tree")
-  if vim.v.shell_error == 0 then
-    require("fzf-lua").git_files()
-  else
-    require("fzf-lua").files()
-  end
-end
-
 return {
-  -- Disable telescope
+  -- Disable telescope and fzf-lua (replaced by snacks picker)
   { "nvim-telescope/telescope.nvim", enabled = false },
   { "nvim-telescope/telescope-fzf-native.nvim", enabled = false },
+  { "ibhagwan/fzf-lua", enabled = false },
+
+  -- Custom Snacks picker keymaps
   {
-    "ibhagwan/fzf-lua",
+    "snacks.nvim",
     keys = {
       {
         "<leader>fg",
         function()
-          fallback_to_find_files_if_not_git()
+          Snacks.picker.git_files()
         end,
         desc = "Find Git File",
       },
       {
         "<leader>fw",
         function()
-          live_grep_from_project_git_root()
+          Snacks.picker.grep({ cwd = LazyVim.root() })
         end,
         desc = "Live Grep in Project Root",
       },
       {
         "gR",
         function()
-          require("fzf-lua").resume()
+          Snacks.picker.resume()
         end,
-        desc = "Resume Last FzfLua",
+        desc = "Resume Last Picker",
       },
       {
         "<leader>fa",
         function()
-          require("fzf-lua").files({ cmd = "fd --type f --hidden --no-ignore --follow" })
+          Snacks.picker.files({ hidden = true, ignored = true })
         end,
         desc = "Find All Files (including hidden)",
       },

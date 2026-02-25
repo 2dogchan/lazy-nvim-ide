@@ -139,10 +139,9 @@ end, { desc = "Next Error" })
 -- Trouble
 -- Add keymap only show FIXME
 if Util.has("todo-comments.nvim") then
-  -- show fixme on telescope
-  keymap("n", "<leader>xf", "<cmd>TodoFzfLua keywords=FIX,FIXME<CR>", {
-    desc = "Show FIXME",
-  })
+  keymap("n", "<leader>xf", function()
+    Snacks.picker.todo_comments({ keywords = { "FIX", "FIXME" } })
+  end, { desc = "Show FIXME" })
 end
 
 -- Gitsigns
@@ -170,7 +169,7 @@ keymap("n", "<C-LeftMouse>", function()
   vim.lsp.buf_request(0, "textDocument/definition", params, function(err, result)
     if err or not result or vim.tbl_isempty(result) then
       vim.schedule(function()
-        vim.cmd("FzfLua lsp_references jump1=true ignore_current_line=true")
+        Snacks.picker.lsp_references()
       end)
       return
     end
@@ -182,11 +181,11 @@ keymap("n", "<C-LeftMouse>", function()
     -- Check if we're already at the definition
     if def_uri == current_uri and def_range and def_range.start.line == cursor_line then
       vim.schedule(function()
-        vim.cmd("FzfLua lsp_references jump1=true ignore_current_line=true")
+        Snacks.picker.lsp_references()
       end)
     else
       vim.schedule(function()
-        vim.cmd("FzfLua lsp_definitions jump1=true ignore_current_line=true")
+        Snacks.picker.lsp_definitions()
       end)
     end
   end)
