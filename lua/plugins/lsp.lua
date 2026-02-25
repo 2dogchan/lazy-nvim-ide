@@ -1,5 +1,15 @@
 return {
   {
+    -- Fix: lazydev hardcodes lua_root=true, which sets runtime.path to {"?.lua","?/init.lua"}.
+    -- This breaks gd on require("config.lazy") in init.lua because lua_ls looks for
+    -- config/lazy.lua instead of lua/config/lazy.lua.
+    -- lua_root=false sets runtime.path to {"lua/?.lua","lua/?/init.lua"} which resolves correctly.
+    "folke/lazydev.nvim",
+    init = function()
+      require("lazydev.config").lua_root = false
+    end,
+  },
+  {
     "dnlhc/glance.nvim",
     keys = {
       { "gld", "<cmd>Glance definitions<cr>", desc = "Glance Definition" },
