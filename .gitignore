@@ -6,5 +6,4 @@ debug
 foo.*
 *.log
 data
-lazyvim.json
 .luarc.json
