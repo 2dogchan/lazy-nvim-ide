@@ -15,14 +15,20 @@ return {
       {
         "<leader>e",
         function()
-          Snacks.explorer.open({ cwd = vim.uv.cwd() })
+          local ok, err = pcall(Snacks.explorer.open, { cwd = vim.uv.cwd() })
+          if not ok and not err:match("Invalid buffer") then
+            vim.notify(err, vim.log.levels.ERROR)
+          end
         end,
         desc = "Explorer (project root)",
       },
       {
         "<leader>E",
         function()
-          Snacks.explorer.open({ cwd = LazyVim.root() })
+          local ok, err = pcall(Snacks.explorer.open, { cwd = LazyVim.root() })
+          if not ok and not err:match("Invalid buffer") then
+            vim.notify(err, vim.log.levels.ERROR)
+          end
         end,
         desc = "Explorer (LazyVim root)",
       },

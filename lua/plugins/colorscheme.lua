@@ -3,29 +3,26 @@ return {
   { "nickkadutskyi/jb.nvim", enabled = false },
   { "folke/tokyonight.nvim", enabled = false },
   { "catppuccin/nvim", enabled = false },
+  { "projekt0n/github-nvim-theme", enabled = false },
+  { "maxmx03/solarized.nvim", enabled = false },
+  { "sainnhe/everforest", enabled = false },
 
-  -- One Dark theme (Zed-style)
+  -- OneDark warmer（Go 保持原味，Dart 单独用 Darcula 风格覆盖）
   {
     "navarasu/onedark.nvim",
     lazy = false,
     priority = 1000,
     opts = {
-      style = "dark",
+      style = "warmer",
       transparent = false,
       term_colors = true,
-      ending_tildes = false,
-      cmp_itemkind_reverse = false,
 
       code_style = {
         comments = "italic",
-        keywords = "none",
+        keywords = "bold",
         functions = "none",
         strings = "none",
         variables = "none",
-      },
-
-      lualine = {
-        transparent = false,
       },
 
       diagnostics = {
@@ -33,38 +30,69 @@ return {
         undercurl = true,
         background = false,
       },
-
-      highlights = {
-        -- Subtle indent guides
-        SnacksIndent = { fg = "#3b3f4c" },
-        SnacksIndentScope = { fg = "#565c6e" },
-
-        -- Clean cursorline
-        CursorLine = { bg = "#2c313a" },
-        CursorLineNr = { fg = "#e5c07b", bold = true },
-
-        -- Clean floating windows
-        NormalFloat = { bg = "#21252b" },
-        FloatBorder = { fg = "#3e4452", bg = "#21252b" },
-
-        -- Winbar / breadcrumbs
-        WinBar = { fg = "#7f848e", bg = "NONE" },
-        WinBarNC = { fg = "#5c6370", bg = "NONE" },
-
-        -- Muted line numbers
-        LineNr = { fg = "#4b5263" },
-
-        -- Clean fold column
-        FoldColumn = { fg = "#4b5263", bg = "NONE" },
-      },
     },
     config = function(_, opts)
       require("onedark").setup(opts)
       require("onedark").load()
+
+      -- 只对 Dart 文件应用 Darcula 风格：减少颜色种类
+      local fg = "#A9B7C6"
+      local kw = "#CC7832"
+      local fn = "#FFC66D"
+      local str = "#6A8759"
+      local num = "#6897BB"
+      local cmt = "#808080"
+
+      local dart_hls = {
+        ["@variable.dart"] = { fg = fg },
+        ["@variable.member.dart"] = { fg = fg },
+        ["@variable.parameter.dart"] = { fg = fg },
+        ["@variable.builtin.dart"] = { fg = fg },
+        ["@property.dart"] = { fg = fg },
+        ["@field.dart"] = { fg = fg },
+        ["@parameter.dart"] = { fg = fg },
+        ["@constant.dart"] = { fg = fg },
+        ["@constant.builtin.dart"] = { fg = kw, bold = true },
+        ["@function.dart"] = { fg = fn },
+        ["@function.call.dart"] = { fg = fn },
+        ["@function.method.dart"] = { fg = fn },
+        ["@function.method.call.dart"] = { fg = fn },
+        ["@method.dart"] = { fg = fn },
+        ["@method.call.dart"] = { fg = fn },
+        ["@constructor.dart"] = { fg = fn },
+        ["@keyword.dart"] = { fg = kw, bold = true },
+        ["@keyword.return.dart"] = { fg = kw, bold = true },
+        ["@keyword.function.dart"] = { fg = kw, bold = true },
+        ["@keyword.operator.dart"] = { fg = kw, bold = true },
+        ["@keyword.conditional.dart"] = { fg = kw, bold = true },
+        ["@keyword.repeat.dart"] = { fg = kw, bold = true },
+        ["@keyword.exception.dart"] = { fg = kw, bold = true },
+        ["@keyword.import.dart"] = { fg = kw },
+        ["@keyword.type.dart"] = { fg = kw, bold = true },
+        ["@type.dart"] = { fg = fg },
+        ["@type.builtin.dart"] = { fg = kw, bold = true },
+        ["@type.qualifier.dart"] = { fg = kw, bold = true },
+        ["@string.dart"] = { fg = str },
+        ["@string.escape.dart"] = { fg = kw },
+        ["@number.dart"] = { fg = num },
+        ["@number.float.dart"] = { fg = num },
+        ["@boolean.dart"] = { fg = kw, bold = true },
+        ["@comment.dart"] = { fg = cmt, italic = true },
+        ["@operator.dart"] = { fg = fg },
+        ["@punctuation.dart"] = { fg = fg },
+        ["@punctuation.bracket.dart"] = { fg = fg },
+        ["@punctuation.delimiter.dart"] = { fg = fg },
+        ["@module.dart"] = { fg = fg },
+        ["@namespace.dart"] = { fg = fg },
+        ["@attribute.dart"] = { fg = "#BBB529" },
+      }
+
+      for group, hl in pairs(dart_hls) do
+        vim.api.nvim_set_hl(0, group, hl)
+      end
     end,
   },
 
-  -- Tell LazyVim to use onedark
   {
     "LazyVim/LazyVim",
     opts = {
