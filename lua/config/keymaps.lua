@@ -1,209 +1,140 @@
--- Keymaps are automatically loaded on the VeryLazy event
--- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
--- Add any additional keymaps here
+-- Custom keymaps. Loaded on VeryLazy, after LazyVim's defaults:
+-- https://www.lazyvim.org/keymaps
 --
-local Util = require("lazyvim.util")
-local keymap = vim.keymap.set
--- Silent keymap option
-local opts = { silent = true }
+-- Rule of thumb: LazyVim's defaults are kept as-is (gd / gr / gI / gy / K, <leader>c…, <leader>g…,
+-- <leader>s…, <leader>x…, <leader>a… for Claude). Everything below is either a personal habit or a
+-- review helper that LazyVim does not provide. Plugin-specific keys live next to their plugin spec.
 
--- Disable `q` for macro recording as default
--- Set initial state for 'q'
-vim.g.q_record_macro = false
+local map = vim.keymap.set
 
--- Function to toggle 'q' functionality
-function _G.toggle_q_macro()
-  if vim.g.q_record_macro then
-    -- If currently set for recording macros, make 'q' do nothing
-    keymap("n", "q", "<Nop>", { noremap = true })
-    vim.g.q_record_macro = false
-  else
-    -- If currently set to do nothing, make 'q' record macros
-    keymap("n", "q", "q", { noremap = true })
-    vim.g.q_record_macro = true
-  end
-end
+-- ───────────────────────────────── Movement & scrolling ─────────────────────────────────
+-- `$` stops at the last non-blank, `g_` goes to the true end of line
+map({ "n", "v" }, "$", "g_")
+map({ "n", "v" }, "g_", "$")
+-- Half-page keys move a fixed 10 lines, so the cursor never jumps unpredictably
+map("n", "<C-u>", "10k", { silent = true })
+map("n", "<C-d>", "10j", { silent = true })
+-- Scroll the view 3 lines at a time
+map("n", "<C-e>", "3<C-e>", { silent = true })
+map("n", "<C-y>", "3<C-y>", { silent = true })
 
-keymap(
-  "n",
-  "<leader>uq",
-  "<cmd>lua _G.toggle_q_macro()<CR>",
-  { noremap = true, silent = true, desc = "Toggle 'q' Functionality" }
-)
-keymap("n", "q", "<Nop>", { noremap = true })
+-- ───────────────────────────────────── Editing ──────────────────────────────────────────
+-- Paste over a selection without clobbering the unnamed register
+map("v", "p", '"_dP', { silent = true })
+-- Move lines with Alt+Arrow (LazyVim already has Alt+j/k)
+map("n", "<A-Down>", "<cmd>m .+1<cr>==", { desc = "Move Line Down", silent = true })
+map("n", "<A-Up>", "<cmd>m .-2<cr>==", { desc = "Move Line Up", silent = true })
+map("i", "<A-Down>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move Line Down", silent = true })
+map("i", "<A-Up>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move Line Up", silent = true })
+map("v", "<A-Down>", ":m '>+1<cr>gv=gv", { desc = "Move Selection Down", silent = true })
+map("v", "<A-Up>", ":m '<-2<cr>gv=gv", { desc = "Move Selection Up", silent = true })
+-- Accept the first spelling suggestion
+map("n", "z0", "1z=", { desc = "Fix Word Under Cursor" })
 
--- Set initial state for diagnostic level
-vim.g.diagnostics_level = "all"
+-- `q` is disabled by default so a stray press never starts recording a macro. <leader>uq re-enables it.
+map("n", "q", "<Nop>")
+Snacks.toggle({
+  name = "Macro Recording (q)",
+  get = function()
+    return vim.g.q_record_macro == true
+  end,
+  set = function(state)
+    vim.g.q_record_macro = state
+    map("n", "q", state and "q" or "<Nop>")
+  end,
+}):map("<leader>uq")
 
--- Function to toggle diagnostic level
-function _G.toggle_diagnostics_level()
-  if vim.g.diagnostics_level == "all" then
-    vim.notify("Diagnostics level: error", "info", { title = "Diagnostics" })
-    vim.g.diagnostics_level = "error"
-    vim.diagnostic.config({
-      severity_sort = true,
-      underline = { severity = vim.diagnostic.severity.ERROR },
-      signs = { severity = vim.diagnostic.severity.ERROR },
-      virtual_text = {
-        prefix = "●",
-        spacing = 2,
-        severity = vim.diagnostic.severity.ERROR,
-      },
-    })
-  else
-    vim.notify("Diagnostics level: all", "info", { title = "Diagnostics" })
-    vim.g.diagnostics_level = "all"
-    vim.diagnostic.config({
-      severity_sort = true,
-      underline = true,
-      signs = true,
-      virtual_text = {
-        prefix = "●",
-        spacing = 2,
-      },
-    })
-  end
-end
+-- ────────────────────────────────── Buffers & dashboard ─────────────────────────────────
+-- Shift+Q closes the current buffer; fall back to the dashboard when nothing named is left
+map("n", "<S-q>", function()
+  Snacks.bufdelete()
+  vim.schedule(function()
+    local named = vim.tbl_filter(function(b)
+      return b.name ~= ""
+    end, vim.fn.getbufinfo({ buflisted = 1 }))
+    if #named == 0 then
+      Snacks.dashboard.open()
+    end
+  end)
+end, { desc = "Close Buffer" })
 
-keymap(
-  "n",
-  "<leader>uD",
-  "<cmd>lua _G.toggle_diagnostics_level()<CR>",
-  { noremap = true, silent = true, desc = "Toggle Diagnostics Level" }
-)
-
--- Dashboard
--- Add keymap to open alpha dashboard
-keymap("n", "<leader>;", function()
-  -- close all open buffers before open dashboard
+-- <leader>; wipes every non-terminal buffer and shows the dashboard
+map("n", "<leader>;", function()
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-    local buftype = vim.bo[bufnr].buftype
-    if buftype ~= "terminal" then
+    if vim.bo[bufnr].buftype ~= "terminal" then
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end
   end
+  Snacks.dashboard.open()
+end, { desc = "Dashboard" })
 
-  if Util.has("alpha-nvim") then
-    require("alpha").start(true)
+-- ──────────────────────────────────── Review helpers ────────────────────────────────────
+-- Ctrl+Click: jump to definition, or list references when already on the definition
+map("n", "<C-LeftMouse>", function()
+  local mouse = vim.fn.getmousepos()
+  if mouse.winid ~= 0 then
+    vim.api.nvim_set_current_win(mouse.winid)
   end
-end, opts)
-
--- Close buffers
-if Util.has("mini.bufremove") then
-  keymap("n", "<S-q>", function()
-    require("mini.bufremove").delete(0, false)
-    local bufs = vim.fn.getbufinfo({ buflisted = true })
-    -- open alpha if no buffers are left
-    if not bufs[2] and Util.has("alpha-nvim") then
-      require("alpha").start(true)
-    end
-  end, opts)
-else
-  keymap("n", "<S-q>", "<cmd>bd<CR>", opts)
-end
-
--- Better paste
--- remap "p" in visual mode to delete the highlighted text without overwriting your yanked/copied text, and then paste the content from the unnamed register.
-keymap("v", "p", '"_dP', opts)
-
--- Copy whole file content to clipboard with C-c
--- keymap("n", "<C-c>", ":%y+<CR>", opts)
-
--- Visual --
--- Stay in indent mode
-keymap("v", "<", "<gv", opts)
-keymap("v", ">", ">gv", opts)
-
--- Move live up or down
--- moving
-keymap("n", "<A-Down>", ":m .+1<CR>", opts)
-keymap("n", "<A-Up>", ":m .-2<CR>", opts)
-keymap("i", "<A-Down>", "<Esc>:m .+1<CR>==gi", opts)
-keymap("i", "<A-Up>", "<Esc>:m .-2<CR>==gi", opts)
-keymap("v", "<A-Down>", ":m '>+1<CR>gv=gv", opts)
-keymap("v", "<A-Up>", ":m '<-2<CR>gv=gv", opts)
-
--- Show Lsp info
-keymap("n", "<leader>cl", "<cmd>LspInfo<CR>", opts)
-
--- Neovim 0.11+ built-in: grr=references, gra=code_action, gri=implementation, grn=rename
-
--- Diagnostic jump with filters such as only jumping to an error
-keymap("n", "[E", function()
-  vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
-end, { desc = "Prev Error" })
-keymap("n", "]E", function()
-  vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
-end, { desc = "Next Error" })
-
--- Trouble
--- Add keymap only show FIXME
-if Util.has("todo-comments.nvim") then
-  keymap("n", "<leader>xf", function()
-    Snacks.picker.todo_comments({ keywords = { "FIX", "FIXME" } })
-  end, { desc = "Show FIXME" })
-end
-
--- Gitsigns
--- Add toggle gitsigns blame line
-if Util.has("gitsigns.nvim") then
-  keymap("n", "<leader>ub", "<cmd>lua require('gitsigns').toggle_current_line_blame()<CR>", {
-    desc = "Toggle current line blame",
-  })
-end
-
-
--- Ctrl+LeftMouse: auto gd or gr
--- If cursor is on a definition → show references; otherwise → go to definition
-keymap("n", "<C-LeftMouse>", function()
-  -- Move cursor to click position
-  local mousepos = vim.fn.getmousepos()
-  if mousepos.winid ~= 0 then
-    vim.api.nvim_set_current_win(mousepos.winid)
-  end
-  if mousepos.line > 0 then
-    vim.api.nvim_win_set_cursor(0, { mousepos.line, math.max(0, mousepos.column - 1) })
+  if mouse.line > 0 then
+    vim.api.nvim_win_set_cursor(0, { mouse.line, math.max(0, mouse.column - 1) })
   end
 
-  local params = vim.lsp.util.make_position_params()
-  vim.lsp.buf_request(0, "textDocument/definition", params, function(err, result)
+  local client = vim.lsp.get_clients({ bufnr = 0, method = "textDocument/definition" })[1]
+  if not client then
+    return
+  end
+  local params = vim.lsp.util.make_position_params(0, client.offset_encoding)
+  client:request("textDocument/definition", params, function(err, result)
+    local show = Snacks.picker.lsp_definitions
     if err or not result or vim.tbl_isempty(result) then
-      vim.schedule(function()
-        Snacks.picker.lsp_references()
-      end)
-      return
-    end
-    local def = vim.islist(result) and result[1] or result
-    local def_uri = def.uri or def.targetUri
-    local def_range = def.range or def.targetSelectionRange
-    local current_uri = vim.uri_from_bufnr(0)
-    local cursor_line = mousepos.line - 1
-    -- Check if we're already at the definition
-    if def_uri == current_uri and def_range and def_range.start.line == cursor_line then
-      vim.schedule(function()
-        Snacks.picker.lsp_references()
-      end)
+      show = Snacks.picker.lsp_references
     else
-      vim.schedule(function()
-        Snacks.picker.lsp_definitions()
-      end)
+      local def = vim.islist(result) and result[1] or result
+      local uri = def.uri or def.targetUri
+      local range = def.range or def.targetSelectionRange
+      if uri == vim.uri_from_bufnr(0) and range and range.start.line == mouse.line - 1 then
+        show = Snacks.picker.lsp_references
+      end
     end
-  end)
-end, { desc = "Smart goto: definition or references" })
+    vim.schedule(show)
+  end, 0)
+end, { desc = "Smart Goto (Definition / References)" })
 
--- RightMouse: toggle breakpoint on clicked line
-keymap("n", "<RightMouse>", function()
-  local mousepos = vim.fn.getmousepos()
-  if mousepos.winid ~= 0 then
-    vim.api.nvim_set_current_win(mousepos.winid)
-  end
-  if mousepos.line > 0 then
-    vim.api.nvim_win_set_cursor(0, { mousepos.line, 0 })
-  end
-  require("dap").toggle_breakpoint()
-end, { desc = "Toggle breakpoint at mouse position" })
+-- Only show errors (hide warnings/hints) while skimming a noisy file
+Snacks.toggle({
+  name = "Errors Only",
+  get = function()
+    return vim.g.diagnostics_errors_only == true
+  end,
+  set = function(state)
+    vim.g.diagnostics_errors_only = state
+    local severity = state and { min = vim.diagnostic.severity.ERROR } or nil
+    local cfg = vim.diagnostic.config()
+    cfg.underline = severity and { severity = severity } or true
+    if type(cfg.signs) == "table" then
+      cfg.signs.severity = severity
+    end
+    if type(cfg.virtual_text) == "table" then
+      cfg.virtual_text.severity = severity
+    end
+    vim.diagnostic.config(cfg)
+  end,
+}):map("<leader>ux")
 
--- Fix Spell checking
-keymap("n", "z0", "1z=", {
-  desc = "Fix world under cursor",
-})
+-- Inline git blame on the current line (on by default, see review/git.lua). <leader>uG is LazyVim's git signs toggle.
+Snacks.toggle({
+  name = "Line Blame",
+  get = function()
+    -- gitsigns has no public getter; fall back to "on" (our default) if the internal path ever moves
+    local ok, cfg = pcall(require, "gitsigns.config")
+    return not ok or cfg.config.current_line_blame ~= false
+  end,
+  set = function(state)
+    require("gitsigns").toggle_current_line_blame(state)
+  end,
+}):map("<leader>uB")
+
+-- Pick only FIXME comments (LazyVim's <leader>st shows every TODO keyword)
+map("n", "<leader>xf", function()
+  Snacks.picker.todo_comments({ keywords = { "FIX", "FIXME" } })
+end, { desc = "FIXME Comments" })

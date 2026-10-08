@@ -1,13 +1,5 @@
+-- OneDark "warmer" everywhere, with a Darcula-style palette for Dart only (fewer colors, easier to skim).
 return {
-  -- Disable unused colorschemes
-  { "nickkadutskyi/jb.nvim", enabled = false },
-  { "folke/tokyonight.nvim", enabled = false },
-  { "catppuccin/nvim", enabled = false },
-  { "projekt0n/github-nvim-theme", enabled = false },
-  { "maxmx03/solarized.nvim", enabled = false },
-  { "sainnhe/everforest", enabled = false },
-
-  -- OneDark warmer（Go 保持原味，Dart 单独用 Darcula 风格覆盖）
   {
     "navarasu/onedark.nvim",
     lazy = false,
@@ -16,7 +8,6 @@ return {
       style = "warmer",
       transparent = false,
       term_colors = true,
-
       code_style = {
         comments = "italic",
         keywords = "bold",
@@ -24,7 +15,6 @@ return {
         strings = "none",
         variables = "none",
       },
-
       diagnostics = {
         darker = true,
         undercurl = true,
@@ -35,14 +25,9 @@ return {
       require("onedark").setup(opts)
       require("onedark").load()
 
-      -- 只对 Dart 文件应用 Darcula 风格：减少颜色种类
-      local fg = "#A9B7C6"
-      local kw = "#CC7832"
-      local fn = "#FFC66D"
-      local str = "#6A8759"
-      local num = "#6897BB"
-      local cmt = "#808080"
-
+      -- Dart: Darcula-like, intentionally low-contrast between token kinds
+      local fg, kw, fn, str, num, cmt = "#A9B7C6", "#CC7832", "#FFC66D", "#6A8759", "#6897BB", "#808080"
+      local keyword = { fg = kw, bold = true }
       local dart_hls = {
         ["@variable.dart"] = { fg = fg },
         ["@variable.member.dart"] = { fg = fg },
@@ -52,7 +37,7 @@ return {
         ["@field.dart"] = { fg = fg },
         ["@parameter.dart"] = { fg = fg },
         ["@constant.dart"] = { fg = fg },
-        ["@constant.builtin.dart"] = { fg = kw, bold = true },
+        ["@constant.builtin.dart"] = keyword,
         ["@function.dart"] = { fg = fn },
         ["@function.call.dart"] = { fg = fn },
         ["@function.method.dart"] = { fg = fn },
@@ -60,23 +45,23 @@ return {
         ["@method.dart"] = { fg = fn },
         ["@method.call.dart"] = { fg = fn },
         ["@constructor.dart"] = { fg = fn },
-        ["@keyword.dart"] = { fg = kw, bold = true },
-        ["@keyword.return.dart"] = { fg = kw, bold = true },
-        ["@keyword.function.dart"] = { fg = kw, bold = true },
-        ["@keyword.operator.dart"] = { fg = kw, bold = true },
-        ["@keyword.conditional.dart"] = { fg = kw, bold = true },
-        ["@keyword.repeat.dart"] = { fg = kw, bold = true },
-        ["@keyword.exception.dart"] = { fg = kw, bold = true },
+        ["@keyword.dart"] = keyword,
+        ["@keyword.return.dart"] = keyword,
+        ["@keyword.function.dart"] = keyword,
+        ["@keyword.operator.dart"] = keyword,
+        ["@keyword.conditional.dart"] = keyword,
+        ["@keyword.repeat.dart"] = keyword,
+        ["@keyword.exception.dart"] = keyword,
         ["@keyword.import.dart"] = { fg = kw },
-        ["@keyword.type.dart"] = { fg = kw, bold = true },
+        ["@keyword.type.dart"] = keyword,
         ["@type.dart"] = { fg = fg },
-        ["@type.builtin.dart"] = { fg = kw, bold = true },
-        ["@type.qualifier.dart"] = { fg = kw, bold = true },
+        ["@type.builtin.dart"] = keyword,
+        ["@type.qualifier.dart"] = keyword,
         ["@string.dart"] = { fg = str },
         ["@string.escape.dart"] = { fg = kw },
         ["@number.dart"] = { fg = num },
         ["@number.float.dart"] = { fg = num },
-        ["@boolean.dart"] = { fg = kw, bold = true },
+        ["@boolean.dart"] = keyword,
         ["@comment.dart"] = { fg = cmt, italic = true },
         ["@operator.dart"] = { fg = fg },
         ["@punctuation.dart"] = { fg = fg },
@@ -86,17 +71,11 @@ return {
         ["@namespace.dart"] = { fg = fg },
         ["@attribute.dart"] = { fg = "#BBB529" },
       }
-
       for group, hl in pairs(dart_hls) do
         vim.api.nvim_set_hl(0, group, hl)
       end
     end,
   },
 
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "onedark",
-    },
-  },
+  { "LazyVim/LazyVim", opts = { colorscheme = "onedark" } },
 }

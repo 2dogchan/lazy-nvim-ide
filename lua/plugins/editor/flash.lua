@@ -1,5 +1,5 @@
+-- flash.nvim jump labels (s / S / r / R). Regular `/` search is left alone.
 return {
   "folke/flash.nvim",
-  -- Dont intercept the `Regular Search`
   opts = { modes = { search = { enabled = false } } },
 }

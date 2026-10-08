@@ -1,49 +1,19 @@
--- Options are automatically loaded before lazy.nvim startup
--- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
+-- Options are loaded before lazy.nvim starts. LazyVim's defaults:
+-- https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
+-- Diagnostic display is configured in lua/plugins/coding/lsp.lua (LazyVim overrides it otherwise).
 
--- set local leader is '\'
 vim.g.maplocalleader = "\\"
 
--- Enable spell check by default
--- vim.o.spell = true
+-- Project root: LSP root first, cwd as fallback
+vim.g.root_spec = { "lsp", "cwd" }
 
--- Set conceal level to 0
--- vim.o.conceallevel = 0
-
--- Disable providers
+-- No remote-plugin providers are used
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_node_provider = 0
 
--- Use LSP root detection first, fall back to cwd
-vim.g.root_spec = { "lsp", "cwd" }
-
-
--- Zed-like options
+-- Zed-like feel
 vim.o.scrolloff = 8
 vim.o.wrap = false
-vim.o.showmode = false
-
--- Zed-style diagnostic display
-vim.diagnostic.config({
-  virtual_text = {
-    prefix = "●",
-    spacing = 2,
-  },
-  signs = {
-    text = {
-      [vim.diagnostic.severity.ERROR] = " ",
-      [vim.diagnostic.severity.WARN] = " ",
-      [vim.diagnostic.severity.INFO] = " ",
-      [vim.diagnostic.severity.HINT] = " ",
-    },
-  },
-  underline = true,
-  update_in_insert = false,
-  severity_sort = true,
-  float = {
-    border = "rounded",
-    source = true,
-  },
-})
+vim.o.showmode = false -- the statusline shows the mode

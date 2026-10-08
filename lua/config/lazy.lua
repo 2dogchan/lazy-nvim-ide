@@ -1,6 +1,16 @@
+-- Bootstrap lazy.nvim, then load LazyVim + the extras and plugin folders below.
+--
+-- Layout of lua/plugins/ (each folder is imported explicitly, lazy.nvim does not recurse):
+--   disabled.lua  every plugin we turn off, in one place
+--   ui/           how it looks: colorscheme, statusline, dashboard, bufferline, scrollbar, layout, folding
+--   editor/       moving around: picker, explorer, flash, undotree, structural replace, buffer retirement
+--   review/       the ADE core: git signs, inline blame, diffview
+--   coding/       language-agnostic: LSP defaults, treesitter, test runner
+--   lang/         per-language: go, rust, flutter, lua
+--   vscode.lua    minimal setup when running inside VSCode
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then
-  -- bootstrap lazy.nvim
   -- stylua: ignore
   vim.fn.system({ "git", "clone", "--filter=blob:none", "https://github.com/folke/lazy.nvim.git", "--branch=stable", lazypath })
 end
@@ -8,43 +18,50 @@ vim.opt.rtp:prepend(vim.env.LAZY or lazypath)
 
 require("lazy").setup({
   spec = {
-    -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
-    -- Go + Lua development
+
+    -- Languages (Go / Rust / Flutter) + data formats
     { import = "lazyvim.plugins.extras.lang.go" },
+    { import = "lazyvim.plugins.extras.lang.rust" },
+    { import = "lazyvim.plugins.extras.lang.toml" },
+    { import = "lazyvim.plugins.extras.lang.dart" },
     { import = "lazyvim.plugins.extras.lang.json" },
     { import = "lazyvim.plugins.extras.lang.yaml" },
-    -- DAP
-    { import = "lazyvim.plugins.extras.dap.core" },
-    { import = "lazyvim.plugins.extras.dap.nlua" },
-    -- Testing
+    { import = "lazyvim.plugins.extras.lang.markdown" },
+
+    -- Tests: kept to verify AI-written changes. No debugger on purpose.
     { import = "lazyvim.plugins.extras.test.core" },
-    -- UI
-    { import = "lazyvim.plugins.extras.ui.edgy" },
-    -- Util
+
+    -- Reading code: breadcrumbs, sticky function header, symbol outline, side panels
+    { import = "lazyvim.plugins.extras.editor.navic" },
+    { import = "lazyvim.plugins.extras.ui.treesitter-context" },
+    { import = "lazyvim.plugins.extras.ui.edgy" }, -- must come before editor.aerial
+    { import = "lazyvim.plugins.extras.editor.aerial" },
+
+    -- Claude Code IDE integration (<leader>a…)
+    { import = "lazyvim.plugins.extras.ai.claudecode" },
+
+    -- Color swatches for hex codes etc.
     { import = "lazyvim.plugins.extras.util.mini-hipatterns" },
-    -- import/override with your plugins
+
+    -- Our own specs
     { import = "plugins" },
+    { import = "plugins.ui" },
+    { import = "plugins.editor" },
+    { import = "plugins.review" },
+    { import = "plugins.coding" },
+    { import = "plugins.lang" },
   },
   defaults = {
-    -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
-    -- If you know what you're doing, you can set this to `true` to have all your custom plugins lazy-loaded by default.
-    lazy = false,
-    -- It's recommended to leave version=false for now, since a lot the plugin that support versioning,
-    -- have outdated releases, which may break your Neovim install.
+    lazy = false, -- our own specs load at startup unless they say otherwise
     version = false, -- always use the latest git commit
-    -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
   install = { colorscheme = { "onedark" } },
-  checker = { enabled = true }, -- automatically check for plugin updates
+  checker = { enabled = true }, -- notify when plugin updates are available
   performance = {
     rtp = {
-      -- disable some rtp plugins
       disabled_plugins = {
         "gzip",
-        -- "matchit",
-        -- "matchparen",
-        -- "netrwPlugin",
         "tarPlugin",
         "tohtml",
         "tutor",
